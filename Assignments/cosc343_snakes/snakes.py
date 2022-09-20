@@ -1,7 +1,8 @@
 __author__ = "Lech Szymanski"
 __organization__ = "COSC343/AIML402, University of Otago"
 __email__ = "lech.szymanski@otago.ac.nz"
-__date__ = "August 2022"
+__date__ = "September 2022"
+__version__ = 1.1
 
 import importlib
 import numpy as np
@@ -28,7 +29,7 @@ def percepts_global_to_agent_frame_of_reference(percepts,rotation):
     elif rotation == 270:
         percepts = np.rot90(percepts, axes=[1, 0])
     elif rotation == 180:
-        percepts = np.flip(percepts, axis=0)
+        percepts = np.rot90(np.rot90(percepts,axes=[0,1]),axes=[0,1])
 
     return percepts
 
@@ -1300,10 +1301,10 @@ class SnakeGame:
                 else:
                     if game==1:
                         sys.stdout.write("\nTournament %s vs. %s!!!" % (players[0].name, players[1].name))
-                sys.stdout.write("\n  Game %d..." % (game))
+                sys.stdout.write("\n Game %d..." % (game))
 
             else:
-                sys.stdout.write("\n  Gen %3d/%d..." % (game+gens_count, tot_gens))
+                sys.stdout.write("\n Gen %3d/%d..." % (game+gens_count, tot_gens))
 
             if trainGames is None and game in show_games and not self.in_tournament:
                 showGame = "Snakes on a plane!"
@@ -1330,15 +1331,15 @@ class SnakeGame:
                 score = gameResult
                 if len(players) > 1:
                     if score>0:
-                        sys.stdout.write("won by %s (orange) with" % (players[0].name))
+                        sys.stdout.write(" won by %s (orange) with" % (players[0].name))
                     elif score<0:
-                        sys.stdout.write("won by %s (purlpe) with" % (players[1].name))
+                        sys.stdout.write(" won by %s (purple) with" % (players[1].name))
                         score *= -1
                     else:
                         sys.stdout.write("tied with")
 
 
-                sys.stdout.write(" score=%02d after %d turn" % (np.abs(score),sgame.turn+1))
+                sys.stdout.write(" a score of %02d after %d turn" % (np.abs(score),sgame.turn+1))
                 if sgame.turn!=0:
                     sys.stdout.write("s")
                 sys.stdout.write(".")
