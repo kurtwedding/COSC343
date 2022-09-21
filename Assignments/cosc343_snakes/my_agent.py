@@ -87,11 +87,8 @@ def evalFitness(population):
         # snake is an instance of Snake class that you implemented above, therefore you can access any attributes
         # (such as 'self.chromosome').  Additionally, the object has the following attributes provided by the
         # game engine:
-        #
-        # snake.size - list of snake sizes over the game turns
-        # .
-        # .
-        # .
+        #       snake.size - list of snake sizes over the game turns
+
         maxSize = np.max(snake.sizes)
         turnsAlive = np.sum(snake.sizes > 0)
         maxTurns = len(snake.sizes)
@@ -99,10 +96,15 @@ def evalFitness(population):
         # This fitness functions considers snake size plus the fraction of turns the snake
         # lasted for.  It should be a reasonable fitness function, though you're free
         # to augment it with information from other stats as well
-        fitness[n] = (2 * maxSize) + turnsAlive / maxTurns
+
+        # In testing, the turnsAlive was not a good indicator of fitness, as snakes can loop 
+        # around themselves forever if they are 4 long, and this skews the turnsAlive causing
+        # snakes that do not progress to be considered fitter than other snakes, so I have
+        # altered it so it has less impact.
+        fitness[n] = maxSize + turnsAlive / (2*maxTurns)
+
 
     return fitness
-
 
 def newGeneration(old_population):
 
@@ -115,7 +117,6 @@ def newGeneration(old_population):
     nPercepts = old_population[0].nPercepts
     actions = old_population[0].actions
 
-
     fitness = evalFitness(old_population)
 
     # At this point you should sort the old_population snakes according to fitness, setting it up for parent
@@ -123,19 +124,9 @@ def newGeneration(old_population):
     values = list()
 
     for i in range(N):
-        values.append((fitness[i], old_population[i].chromosome[0].tolist()))
+        values.append((fitness[i], old_population[i].chromosome.tolist()))
     values.sort(key=lambda x: x[0], reverse=True) # sort the list of chromosomes by fitness, descending
-    # for element in values:
-    #     print(element)
-    #time.sleep(100)
-
-    # for ele in range(N):
-    #     values[ele] = (fitness[ele], old_population[ele].chromosome)
-    # sorted_old_population = np.array(values, dtype=dtype)
-    # np.sort(sorted_old_population, axis=None, order='fitness')
-    # old_population = sorted_old_population
     old_population = values
-    # print("old population variable: ", old_population)
 
     # Create new population list...
     new_population = list()
@@ -149,20 +140,19 @@ def newGeneration(old_population):
 
         # Consider implementing elitism, mutation and various other
         # strategies for producing a new creature.
+
         # ====== Elitism =======
-        parent1 = old_population[0][1] # returns a list of chromosomes
-        parent2 = old_population[1][1] # returns a list of chromosomes
-        # print(parent1)
-        # print(parent2)
-        for i in range(len(parent1)-1):
-            r = np.random.uniform(0, 1.05)
-            if r < 0.05: # Mutation has about a 5% chance of happening
-                new_snake.chromosome[i] = np.random.uniform(-20, 20)
-            elif r < 0.55:
-                new_snake.chromosome[i] = parent1[i]
-            else:
-                new_snake.chromosome[i] = parent2[i]
-        
+        parent1 = old_population[0][1] # returns an array of chromosomes
+        parent2 = old_population[1][1] # returns an array of chromosomes
+        for a in range(len(parent1)):
+            for n in range(len(parent1[a])):
+                r = np.random.uniform(0, 1)
+                if r < 0.04: # Mutation has a 4% chance of happening
+                    pass # the initialization already randomizes the chromosome
+                elif r < 0.52:
+                    new_snake.chromosome[a][n] = parent1[a][n]
+                else:
+                    new_snake.chromosome[a][n] = parent2[a][n]        
 
         # Add the new snake to the new population
         new_population.append(new_snake)
