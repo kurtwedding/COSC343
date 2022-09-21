@@ -3,10 +3,9 @@ __organization__ = "COSC343/AIML402, University of Otago"
 __email__ = "wedku875@student.otago.ac.nz"
 
 import numpy as np
-import time
 
 agentName = "Kurt's Agent"
-perceptFieldOfVision = 3   # Choose either 3,5,7 or 9
+perceptFieldOfVision = 5   # Choose either 3,5,7 or 9
 perceptFrames = 1          # Choose either 1,2,3 or 4
 trainingSchedule = [("self", 100), ("random", 50)]
 
@@ -18,9 +17,6 @@ class Snake:
         # to be - a list/vector/matrix of numbers - and initialise it with some random
         # values)
         self.chromosome = np.random.uniform(-20, 20, (3, nPercepts+1))
-        # print(self.chromosome)
-
-        # self.chromosome = np.random.uniform(-1, 1, (nPercepts, 3))
         self.nPercepts = nPercepts
         self.actions = actions
 
@@ -147,12 +143,38 @@ def newGeneration(old_population):
         for a in range(len(parent1)):
             for n in range(len(parent1[a])):
                 r = np.random.uniform(0, 1)
+                # ====== Uniform Crossover & Mutation ======
                 if r < 0.04: # Mutation has a 4% chance of happening
                     pass # the initialization already randomizes the chromosome
                 elif r < 0.52:
                     new_snake.chromosome[a][n] = parent1[a][n]
                 else:
-                    new_snake.chromosome[a][n] = parent2[a][n]        
+                    new_snake.chromosome[a][n] = parent2[a][n]
+
+        # ====== Roulette Wheel Selection ======
+        """ sumFitness = 0
+        for element in old_population:
+            sumFitness += element[0] """
+
+        # ====== Tournament Selection ======
+        """ tournamentSize = 5
+        new_pop = list()
+        for n in range(tournamentSize):
+            r = np.random.choice(old_population)
+            new_pop.append(r)
+        print(new_pop)
+        time.sleep(100)
+        new_pop.sort(key=lambda x: x[0], reverse=True) # sort by fitness
+        parent1 = new_pop[0][1]
+        parent2 = new_pop[1][1]
+        n = np.random.randint(len(parent1))
+        for a in range(len(parent1)):
+            if np.random.random() <= 0.04:
+                pass
+            elif a < n:
+                new_snake.chromosome[a] = parent1[a]
+            else:
+                new_snake.chromosome[a] = parent2[a] """
 
         # Add the new snake to the new population
         new_population.append(new_snake)
