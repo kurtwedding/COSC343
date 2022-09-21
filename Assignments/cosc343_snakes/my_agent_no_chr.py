@@ -3,8 +3,9 @@ __organization__ = "COSC343/AIML402, University of Otago"
 __email__ = "wedku875@student.otago.ac.nz"
 
 import numpy as np
+import time
 
-agentName = "<my_agent>"
+agentName = "<my_agent_2>"
 perceptFieldOfVision = 3   # Choose either 3,5,7 or 9
 perceptFrames = 1          # Choose either 1,2,3 or 4
 trainingSchedule = [("self", 1), ("random", 1)]
@@ -13,10 +14,14 @@ trainingSchedule = [("self", 1), ("random", 1)]
 class Snake:
 
     def __init__(self, nPercepts, actions):
+        print(nPercepts)
         # You should initialise self.chromosome member variable here (whatever you choose it
         # to be - a list/vector/matrix of numbers - and initialise it with some random
         # values)
         self.chromosome = np.zeros(100)
+        for i in range(len(self.chromosome)):
+            self.chromosome[i] = np.random.randint(-1, 2)
+        print(self.chromosome)
 
         self.nPercepts = nPercepts
         self.actions = actions
@@ -24,7 +29,8 @@ class Snake:
 
 
     def AgentFunction(self, percepts):
-
+        print(percepts)
+        time.sleep(10)
         # You should implement a model here that translates from 'percepts' to 'actions'
         # through 'self.chromosome'.
         #
