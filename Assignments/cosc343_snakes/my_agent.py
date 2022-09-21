@@ -3,11 +3,12 @@ __organization__ = "COSC343/AIML402, University of Otago"
 __email__ = "wedku875@student.otago.ac.nz"
 
 import numpy as np
+import time
 
-agentName = "<my_agent>"
+agentName = "Kurt's Agent"
 perceptFieldOfVision = 3   # Choose either 3,5,7 or 9
 perceptFrames = 1          # Choose either 1,2,3 or 4
-trainingSchedule = [("self", 1), ("random", 1)]
+trainingSchedule = [("self", 100), ("random", 50)]
 
 # This is the class for your snake/agent
 class Snake:
@@ -16,8 +17,10 @@ class Snake:
         # You should initialise self.chromosome member variable here (whatever you choose it
         # to be - a list/vector/matrix of numbers - and initialise it with some random
         # values)
-        self.chromosome = np.zeros(100)
+        self.chromosome = np.random.uniform(-20, 20, (3, nPercepts+1))
+        # print(self.chromosome)
 
+        # self.chromosome = np.random.uniform(-1, 1, (nPercepts, 3))
         self.nPercepts = nPercepts
         self.actions = actions
 
@@ -25,11 +28,30 @@ class Snake:
 
     def AgentFunction(self, percepts):
 
-        # You should implement a model here that translates from 'percepts' to 'actions'
-        # through 'self.chromosome'.
-        #
-        # The 'actions' variable must be returned and it must be a 3-item list or 3-dim numpy vector
+        # percepts = percepts.flatten()
+        # print(percepts[0])
+        percepts = percepts[0]
+        flatPercepts = percepts.flatten()
+        for i in range(len(flatPercepts)):
+            if flatPercepts[i] == 2:
+                flatPercepts[i] = 20 # Make the food more attractive
+            elif flatPercepts[i] == 1:
+                flatPercepts[i] = -20 # Make the friendlies less attractive
+            elif flatPercepts[i] == -1:
+                flatPercepts[i] = -20 # Make the enemies less attractive
+        # print(flatPercepts)
 
+        # Implementing the a1 = w1p1 + w2p2 + ... + w9p9 + w10 algorithm to find action weights
+        action = np.zeros(3)
+        for x, arr in enumerate(self.chromosome):
+            for i in range(len(arr)):
+                if i == len(arr)-1:
+                    action[x] += arr[i]
+                else:
+                    action[x] += arr[i] * flatPercepts[i]
+        
+        # print(action)
+        
         #
         # The index of the largest numbers in the 'actions' vector/list is the action taken
         # with the following interpretation:
@@ -45,11 +67,11 @@ class Snake:
         # agents can exhibit different behaviour.
 
         # .
-        # .
-        # .
 
-        index = np.random.randint(low=0, high=len(self.actions))
-        return self.actions[index]
+        return np.argmax(action) -1 # Return the index of the action with the highest weight
+
+        # index = np.random.randint(low=0, high=len(self.actions))
+        # return self.actions[index]
 
 def evalFitness(population):
 
@@ -63,7 +85,7 @@ def evalFitness(population):
     # to score fitness of each agent
     for n, snake in enumerate(population):
         # snake is an instance of Snake class that you implemented above, therefore you can access any attributes
-        # (such as `self.chromosome').  Additionally, the object has the following attributes provided by the
+        # (such as 'self.chromosome').  Additionally, the object has the following attributes provided by the
         # game engine:
         #
         # snake.size - list of snake sizes over the game turns
@@ -77,7 +99,7 @@ def evalFitness(population):
         # This fitness functions considers snake size plus the fraction of turns the snake
         # lasted for.  It should be a reasonable fitness function, though you're free
         # to augment it with information from other stats as well
-        fitness[n] = maxSize + turnsAlive / maxTurns
+        fitness[n] = (2 * maxSize) + turnsAlive / maxTurns
 
     return fitness
 
@@ -98,9 +120,22 @@ def newGeneration(old_population):
 
     # At this point you should sort the old_population snakes according to fitness, setting it up for parent
     # selection.
-    # .
-    # .
-    # .
+    values = list()
+
+    for i in range(N):
+        values.append((fitness[i], old_population[i].chromosome[0].tolist()))
+    values.sort(key=lambda x: x[0], reverse=True) # sort the list of chromosomes by fitness, descending
+    # for element in values:
+    #     print(element)
+    #time.sleep(100)
+
+    # for ele in range(N):
+    #     values[ele] = (fitness[ele], old_population[ele].chromosome)
+    # sorted_old_population = np.array(values, dtype=dtype)
+    # np.sort(sorted_old_population, axis=None, order='fitness')
+    # old_population = sorted_old_population
+    old_population = values
+    # print("old population variable: ", old_population)
 
     # Create new population list...
     new_population = list()
@@ -114,10 +149,20 @@ def newGeneration(old_population):
 
         # Consider implementing elitism, mutation and various other
         # strategies for producing a new creature.
-
-        # .
-        # .
-        # .
+        # ====== Elitism =======
+        parent1 = old_population[0][1] # returns a list of chromosomes
+        parent2 = old_population[1][1] # returns a list of chromosomes
+        # print(parent1)
+        # print(parent2)
+        for i in range(len(parent1)-1):
+            r = np.random.uniform(0, 1.05)
+            if r < 0.05: # Mutation has about a 5% chance of happening
+                new_snake.chromosome[i] = np.random.uniform(-20, 20)
+            elif r < 0.55:
+                new_snake.chromosome[i] = parent1[i]
+            else:
+                new_snake.chromosome[i] = parent2[i]
+        
 
         # Add the new snake to the new population
         new_population.append(new_snake)
