@@ -8,7 +8,7 @@ __date__ = "August 2022"
 game_settings = {
 
    #File implementing the agent playing as player 1
-   "player1": "my_agent_no_chr.py",
+   "player1": "my_agent.py",
 
    # File implementing the agent playing as player 2
    "player2": "random_agent.py",
