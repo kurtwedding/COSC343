@@ -20,8 +20,6 @@ class Snake:
         self.nPercepts = nPercepts
         self.actions = actions
 
-
-
     def AgentFunction(self, percepts):
 
         # percepts = percepts.flatten()
@@ -137,49 +135,49 @@ def newGeneration(old_population):
         # Consider implementing elitism, mutation and various other
         # strategies for producing a new creature.
 
-        # ====== Elitism =======
-        parent1 = old_population[0][1] # returns an array of chromosomes
+        # ====== Pure Elitism Selection =======
+        """ parent1 = old_population[0][1] # returns an array of chromosomes
         parent2 = old_population[1][1] # returns an array of chromosomes
-        for a in range(len(parent1)):
-            for n in range(len(parent1[a])):
-                r = np.random.uniform(0, 1)
+        for a in range(len(parent1)): # for each row of chromosomes (3x10)
+            for n in range(len(parent1[a])): # for each chromosome in the row
                 # ====== Uniform Crossover & Mutation ======
+                r = np.random.uniform(0, 1)
                 if r < 0.04: # Mutation has a 4% chance of happening
                     pass # the initialization already randomizes the chromosome
                 elif r < 0.52:
                     new_snake.chromosome[a][n] = parent1[a][n]
                 else:
-                    new_snake.chromosome[a][n] = parent2[a][n]
-
-        # ====== Roulette Wheel Selection ======
-        """ sumFitness = 0
-        for element in old_population:
-            sumFitness += element[0] """
+                    new_snake.chromosome[a][n] = parent2[a][n] """
 
         # ====== Tournament Selection ======
-        """ tournamentSize = 5
+        tournamentSize = 5
         new_pop = list()
         for n in range(tournamentSize):
-            r = np.random.choice(old_population)
-            new_pop.append(r)
-        print(new_pop)
-        time.sleep(100)
+            new_pop.append(old_population[np.random.randint(0, N)]) # adds a random parent to the new population
         new_pop.sort(key=lambda x: x[0], reverse=True) # sort by fitness
-        parent1 = new_pop[0][1]
-        parent2 = new_pop[1][1]
+        parent1 = new_pop[0][1] # pick the best parent as parent 1
+        parent2 = new_pop[1][1] # pick the second best parent as parent 2
         n = np.random.randint(len(parent1))
-        for a in range(len(parent1)):
-            if np.random.random() <= 0.04:
-                pass
-            elif a < n:
-                new_snake.chromosome[a] = parent1[a]
-            else:
-                new_snake.chromosome[a] = parent2[a] """
+        for a in range(len(parent1)): # for each row of chromosomes (3x10)
+            for n in range(len(parent1[a])): # for each chromosome in the row
+                # ====== N-point Crossover & Mutation ======
+                if (np.random.random() < 0.04): # Mutation has a 4% chance of happening:
+                    pass
+                else:
+                    r = np.random.randint(0, len(parent1[a])) # pick an abstract point in the list of chromosomes
+                    if (n < r): # if current chromosome is before the point, use parent 1's chromosome
+                        new_snake.chromosome[a][n] = parent1[a][n]
+                    elif(n >= r): # if current chromosome is after the point, use parent 2's chromosome
+                        new_snake.chromosome[a][n] = parent2[a][n]
 
         # Add the new snake to the new population
         new_population.append(new_snake)
 
     # At the end you need to compute the average fitness and return it along with your new population
     avg_fitness = np.mean(fitness)
+
+    f = open("fitness.txt", "a")
+    f.write(str(avg_fitness) +"\n")
+    f.close()
 
     return (new_population, avg_fitness)

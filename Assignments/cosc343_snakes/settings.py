@@ -17,7 +17,7 @@ game_settings = {
    "gridSize": 50,
 
    # Number of snakes on a plane
-   "nSnakes": 40,
+   "nSnakes": 50,
 
    # Number of turns per game
    "nTurns": 100,
